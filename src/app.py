@@ -6,10 +6,15 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db,User
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_jwt_extended import JWTManager,create_access_token
+
+
+
+
 
 # from models import Person
 
@@ -17,6 +22,11 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
+
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "madeinUSA"  # Change this "super secret" to something else!
+jwt = JWTManager(app)
+
 app.url_map.strict_slashes = False
 
 # database condiguration
@@ -64,6 +74,20 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
+
+@app.route("/login", methods=["POST"])
+@app.route("/token", methods=["POST"])
+def create_token():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+   
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({"msg": "Credenciales inválidas"}), 401
+
+    access_token = create_access_token(identity=user.id)
+    return jsonify(access_token=access_token, username=user.username), 200
 
 
 # this only runs if `$ python src/main.py` is executed
