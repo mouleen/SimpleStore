@@ -18,7 +18,6 @@ class User(db.Model):
             "id": self.id,
             "email": self.email,
             "username": self.username,
-            "password_hash":self.password_hash
             # do not serialize the password, its a security breach
         }
 
@@ -26,4 +25,4 @@ class User(db.Model):
         self.password_hash = generate_password_hash(password)  # Hashea con pbkdf2:sha256
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password_hash, password) # Valida el Hash del password

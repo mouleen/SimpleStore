@@ -16,6 +16,8 @@ from flask_jwt_extended import JWTManager,create_access_token
 
 
 
+
+
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -47,6 +49,8 @@ setup_admin(app)
 # add the admin
 setup_commands(app)
 
+
+
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
 
@@ -76,18 +80,6 @@ def serve_any_other_file(path):
     return response
 
 
-@app.route("/login", methods=["POST"])
-@app.route("/token", methods=["POST"])
-def create_token():
-    username = request.json.get("username", None)
-    password = request.json.get("password", None)
-   
-    user = User.query.filter_by(username=username).first()
-    if not user or not user.check_password(password):
-        return jsonify({"msg": "Credenciales inválidas"}), 401
-
-    access_token = create_access_token(identity=user.id)
-    return jsonify(access_token=access_token, username=user.username), 200
 
 
 # this only runs if `$ python src/main.py` is executed
