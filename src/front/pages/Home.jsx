@@ -1,12 +1,15 @@
 import React, { useEffect,useState } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import RegisterForm from "../components/RegisterForm.jsx";
 import LoginForm from "../components/Loginform.jsx";
+import { useNavigate } from 'react-router-dom';
+import { getToken,getHello } from "../services/api";
 
 export const Home = () => {
-
 	const { store, dispatch } = useGlobalReducer()
+	const navigate = useNavigate();
+	
+
 	//JWT:Variables
 	const [user,setUser] = useState(null);
 	const [token, setToken] = useState(null);
@@ -14,45 +17,34 @@ export const Home = () => {
 	const handleLogout = () => {
 		setUser(null);
 		setToken(null);
+		dispatch({type:"get_token", payload:"" });
+		dispatch({type:"get_user", payload:"" });
 		localStorage.removeItem("user");
 		localStorage.removeItem("token");
+		navigate('/login')
+	}
+    const loadSession = async () => {
+		try {
+			const lsToken=localStorage.getItem("token");
+			if(lsToken){
+				dispatch({type:"get_token", payload:lsToken });
+				setToken(lsToken);
+				return true;
+			}
+		} catch (error) {
+			if (error.message) throw new Error(
+				"Could not fetch the message from the backend. Please check if the backend is running and the backend port is public " + error
+			);	
+		}
+	return false;
 	}
 
 	const loadMessage = async () => {
 		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
-			const login = await fetch(backendUrl + "/api/login",
-				{
-					method:"POST",
-					headers:{
-						"content-type":"application/json"
-					},
-					body:JSON.stringify({
-						"username":"traemesuerte2",
-						"password":"madeinUSA321"
-					})
-				}
-			)
-			const datalogin = await login.json()
-			let access_token=datalogin.access_token;
-
-			if (datalogin.ok) {
-				const response = await fetch(backendUrl + "/api/hello",
-					{
-						headers:{
-							"Authorization":"Bearer "+ access_token
-						}
-					}
-				)
-				const data = await response.json()
-	
-				if (response.ok) dispatch({ type: "set_hello", payload: data.message })
+			if(token){
+				const data=await getHello(token);
+				dispatch({ type: "set_hello", payload: data.message })
 			}
-
-			return data
-
 		} catch (error) {
 			if (error.message) throw new Error(
 				"Could not fetch the message from the backend. Please check if the backend is running and the backend port is public " + error
@@ -62,15 +54,12 @@ export const Home = () => {
 
 	useEffect(() => {
 		//JWT:UseEffect
-		const localStorageUser= localStorage.getItem("user");
-		if(localStorageUser){
-			setUser(JSON.parse(localStorageUser));
-		}
-		loadMessage()
+		loadSession();
+		loadMessage();
 	}, [])
 
 	return (
-		<div className="text-center mt-5">
+		<div className="text-center mt-2">
 			{ token ? (
 				<div className="alert alert-info">
 					{store.message ? (
@@ -81,15 +70,17 @@ export const Home = () => {
 						</span>
 					)}
 					<p>Token: {token}</p>
-          			<button onClick={handleLogout}>Logout</button>
+          			<button className="btn btn-secondary my-1 w-100" onClick={handleLogout}>Logout</button>
           			{user && <p>Usuario: {user}</p>}
 				</div>
 				
 				) : (
 					<>
-					<RegisterForm setToken={setToken} />
-					<hr />
-					<LoginForm  setToken={setToken} />
+					<div className="container">	
+							{/* <RegisterForm setToken={setToken} /> */}
+							<hr />
+							<LoginForm />
+					</div>
 					</>
 				)
 			}

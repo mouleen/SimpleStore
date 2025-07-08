@@ -11,6 +11,7 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { LoginForm } from "./components/Loginform.jsx";
 import { RegisterForm } from "./components/RegisterForm.jsx";
+import  NotFound  from "./pages/NotFound.jsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -25,11 +26,13 @@ export const router = createBrowserRouter(
 
         {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
         <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />
         <Route path="/signup" element={<RegisterForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/private" element={<Home />} />
+        <Route path="/*" element={<NotFound />} />
       </Route>
     )
 );
