@@ -19,12 +19,12 @@ export const Home = () => {
 		dispatch({type:"get_user", payload:"" });
 		dispatch({type:"get_hello", payload:"" });
 		localStorage.removeItem("user");
-		localStorage.removeItem("token");
+		localStorage.removeItem("token");localStorage.removeItem("message");
 
 	}
     const loadSession = () => {
 		const lsToken=localStorage.getItem("token");
-		const lsUser=localStorage.getItem("username");
+		const lsUser=localStorage.getItem("user");
 		if(lsToken){
 			dispatch({type:"get_token", payload:lsToken });
 			dispatch({type:"get_user", payload:lsUser});
@@ -41,7 +41,7 @@ export const Home = () => {
 				const data=await getHello(token);
 				dispatch({ type: "get_hello", payload: await data?.message })
 				setMessage(await data?.message)
-				localStorage.setItem("user", await data?.message);
+				localStorage.setItem("message", await data?.message);
 			} catch (error) {
 				if (error.message) throw new Error(
 					"Could not fetch the message from the backend. Please check if the backend is running and the backend port is public " + error
@@ -54,21 +54,22 @@ export const Home = () => {
 		loadSession();
 		loadMessage();
 	}, [token])
-
 	return (
-		<div className="text-center mt-2">
+		<div className=" mt-2">
 		{ token ? (
-				<div className="alert alert-info">
-					{store.message ? (
-						<span>{store.message}</span>
-					) : ( 
-						<span className="text-danger">
-							Loading message from the backend (make sure your python 🐍 backend is running)...
-						</span>
+			<div className="alert alert-info">
+					{message ? (
+						<p className="text-success text-center mb-5">{message}</p>
+					) : ( <> 
+						<div className="text-center spinner-border text-primary" role="status"></div> 
+							<span className="text-danger text-center">
+								Loading message from the backend (make sure your python 🐍 backend is running)...
+							</span>
+						</>
 					)}
-					<p>Token: {token}</p>
+          			{user && <p className="text-left">Usuario: {user}</p>}
+					{token && <p className="text-left">Token: {token}</p>}
           			<button className="btn btn-secondary my-1 w-100" onClick={handleLogout}>Logout</button>
-          			{user && <p>Usuario: {user}</p>}
 				</div>
 				
 				) : (

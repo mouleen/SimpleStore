@@ -39,19 +39,10 @@ export const LoginForm = ({ setToken }) => {
       setHasAuth(true);
       setLoading(false);
       setError("un exito");
-		  //setToken(store.token);
-      console.log("okTOKEN=",res.access_token);
       if (location.pathname !== '/') {
-        console.log("navigate");
         navigate('/'); 
-      } else {
-        console.log(location.pathname)
-      }
+      } 
     } else {
-		  //localStorage.removeItem("user");
-		  //localStorage.removeItem("token");
-      //dispatch({type: "get_token",payload: "" });
-      console.log("negativo-TOKEN=",store.token)
       setHasAuth(false);
       setLoading(false);
       setError('ERROR - '+res?.msg );
@@ -65,14 +56,7 @@ export const LoginForm = ({ setToken }) => {
       const lsUser=localStorage.getItem("user");
       dispatch({type: "get_token",payload: lsToken });
       dispatch({type: "get_user",payload: lsUser });
-
-      // const timer = setTimeout(() => {
-      //   setLoading(false);
-      //   navigate("/"); 
-      // }, 20); // segundos
-      console.log('useEffectLoginForm')
-      // return () => clearTimeout(timer); // limpieza
-		}
+		}else{setHasAuth(false);}
   },[navigate,hasAuth])
   return (
     <div className="row text-center">
@@ -85,17 +69,17 @@ export const LoginForm = ({ setToken }) => {
                   <input id="newuser"className="form-control" placeholder="Usuario" onChange={(e) => setForm({ ...form, username: e.target.value })} />
                   <label htmlFor="newpassword">Contraseña</label>
                   <input id="newpassword" className="form-control" type="password" placeholder="Contraseña" onChange={(e) => setForm({ ...form, password: e.target.value })} />
-                  <button className="btn btn-secondary my-2 w-100" type="submit">Entrar</button>
+                  <button className="btn btn-secondary my-2 w-100" type="submit" >Entrar</button>
                   {error && <p style={{ color: "red" }}>{error}</p>}
                 </form>
               </div>
             </div>
           ) : (  
-          <div className="col-12">
-            {/* <div className="text-center spinner-border text-primary" role="status">
-            </div> */}
-            <button className="btn btn-secondary my-1 w-100" onClick={handleLogout}>Logout</button> 
-            <p>sesion iniciada</p>
+            <div className="col-12">
+              <div className="text-center spinner-border text-primary" role="status">
+              </div> 
+              <button className="btn btn-secondary my-1 w-100" onClick={handleLogout}>Logout</button> 
+              <p>sesion iniciada</p>
           </div>
         ))
       }

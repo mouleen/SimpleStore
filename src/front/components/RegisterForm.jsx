@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { registerUser } from "../services/api";
 import { useNavigate } from 'react-router-dom';
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
@@ -24,20 +24,6 @@ export const RegisterForm = ({ setToken }) => {
       setMessage(res.msg);
     }
   };
-  useEffect(() => {
-    // const lsToken=localStorage.getItem("token");
-    // if(lsToken){
-    //   setHasAuth(true)
-    //   dispatch({type: "get_token",payload: lsToken });
-    //   const timer = setTimeout(() => {
-    //     navigate("/login"); 
-    //   }, 500); // segundos
-    //   return () => clearTimeout(timer); // limpieza
-    // }
-  },[]);
-
-
-
 
   return (
     <div className="row text-center">
