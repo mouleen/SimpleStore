@@ -1,0 +1,28 @@
+body{
+    background: linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%);
+}
+
+.container-style{
+    font-family: Arial, sans-serif;
+    /*min-height: 100vh;
+     align-items: center;
+     display: flex;
+     justify-content: center;
+     padding: 20px;
+     font-family: Arial, sans-serif;*/
+}
+.custom-brown{
+     width: 100%;
+       padding: 12px;
+       background-color: #d97706;
+       color: white;
+       border: none;
+       border-radius: 8px;
+       font-size: 16px;
+       font-weight: bold;
+       cursor: pointer;
+       margin-bottom: 15px;
+}
+.input-group-text{
+    height: 40px;
+}
