@@ -15,32 +15,25 @@ export const RegisterForm = ({ setToken }) => {
     e.preventDefault();
     const res = await registerUser(form);
     if (res.ok) {
-      //const data = await res;
-      //setToken(res.access_token);
-      localStorage.setItem("token", res.access_token);
-      localStorage.setItem("user", res.username);
-      dispatch({type:"get_token", payload:res.access_token });
-      dispatch({type:"get_user", payload:res.username });
       setForm({ username: "", password: "", email: "" });
       setMessage("Registración existosa");
-      navigate("/login"); 
+      setTimeout(() => {
+        navigate("/login"); 
+       }, 200); // segundos
     } else {
-      setMessage(data.msg);
-      //setForm({ username: "", password: "", email: "" });
+      setMessage(res.msg);
     }
   };
   useEffect(() => {
-    const lsToken=localStorage.getItem("token");
-    if(lsToken){
-      setHasAuth(true)
-      setLoading(false);
-      dispatch({type: "get_token",payload: lsToken });
-      const timer = setTimeout(() => {
-        setLoading(false);
-        navigate("/login"); 
-      }, 500); // segundos
-      return () => clearTimeout(timer); // limpieza
-    }
+    // const lsToken=localStorage.getItem("token");
+    // if(lsToken){
+    //   setHasAuth(true)
+    //   dispatch({type: "get_token",payload: lsToken });
+    //   const timer = setTimeout(() => {
+    //     navigate("/login"); 
+    //   }, 500); // segundos
+    //   return () => clearTimeout(timer); // limpieza
+    // }
   },[]);
 
 

@@ -1,70 +1,67 @@
 import React, { useEffect,useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import RegisterForm from "../components/RegisterForm.jsx";
-import LoginForm from "../components/Loginform.jsx";
-import { useNavigate } from 'react-router-dom';
-import { getToken,getHello } from "../services/api";
+import { getHello } from "../services/api";
 
 export const Home = () => {
 	const { store, dispatch } = useGlobalReducer()
-	const navigate = useNavigate();
-	
+
 
 	//JWT:Variables
-	const [user,setUser] = useState(null);
-	const [token, setToken] = useState(null);
+	const [user,setUser] = useState(localStorage.getItem("user") || null);
+	const [token, setToken] = useState(localStorage.getItem("token") || null);
+	const [message, setMessage] = useState(localStorage.getItem("message") || null);
 	//JWT:Logout
 	const handleLogout = () => {
 		setUser(null);
 		setToken(null);
+		setMessage(null);
 		dispatch({type:"get_token", payload:"" });
 		dispatch({type:"get_user", payload:"" });
+		dispatch({type:"get_hello", payload:"" });
 		localStorage.removeItem("user");
 		localStorage.removeItem("token");
-		navigate('/login')
+
 	}
-    const loadSession = async () => {
-		try {
-			const lsToken=localStorage.getItem("token");
-			if(lsToken){
-				dispatch({type:"get_token", payload:lsToken });
-				setToken(lsToken);
-				return true;
-			}
-		} catch (error) {
-			if (error.message) throw new Error(
-				"Could not fetch the message from the backend. Please check if the backend is running and the backend port is public " + error
-			);	
+    const loadSession = () => {
+		const lsToken=localStorage.getItem("token");
+		const lsUser=localStorage.getItem("username");
+		if(lsToken){
+			dispatch({type:"get_token", payload:lsToken });
+			dispatch({type:"get_user", payload:lsUser});
+			setToken(lsToken);
+			setUser(lsUser);
+			return true;
 		}
 	return false;
 	}
 
 	const loadMessage = async () => {
-		try {
-			if(token){
+		if(token && !message){
+			try {
 				const data=await getHello(token);
-				dispatch({ type: "set_hello", payload: data.message })
+				dispatch({ type: "get_hello", payload: await data?.message })
+				setMessage(await data?.message)
+				localStorage.setItem("user", await data?.message);
+			} catch (error) {
+				if (error.message) throw new Error(
+					"Could not fetch the message from the backend. Please check if the backend is running and the backend port is public " + error
+				);
 			}
-		} catch (error) {
-			if (error.message) throw new Error(
-				"Could not fetch the message from the backend. Please check if the backend is running and the backend port is public " + error
-			);
 		}
 	}
 
 	useEffect(() => {
-		//JWT:UseEffect
 		loadSession();
 		loadMessage();
-	}, [])
+	}, [token])
 
 	return (
 		<div className="text-center mt-2">
-			{ token ? (
+		{ token ? (
 				<div className="alert alert-info">
 					{store.message ? (
 						<span>{store.message}</span>
-					) : (
+					) : ( 
 						<span className="text-danger">
 							Loading message from the backend (make sure your python 🐍 backend is running)...
 						</span>
@@ -77,9 +74,8 @@ export const Home = () => {
 				) : (
 					<>
 					<div className="container">	
-							{/* <RegisterForm setToken={setToken} /> */}
+							<p>Bienvenido a la Home inicia sesion para comenzar</p>
 							<hr />
-							<LoginForm />
 					</div>
 					</>
 				)

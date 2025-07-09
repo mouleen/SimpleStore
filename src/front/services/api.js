@@ -21,10 +21,19 @@ export const registerUser = async (form) => {
     return jsonResponse;
 }
 export const getHello = async (token) => {
-    const response = await fetch(backendUrl + "/api/hello" ,  {
-          method: "GET",
-          headers: { "Content-Type": "application/json" , "Authorization":"Bearer " + token }
+    try {
+        const response = await fetch(backendUrl + "/api/hello" ,  {
+            method: "GET",
+            headers: { "Content-Type": "application/json" , "Authorization":"Bearer " + token }
         });
-    const jsonResponse = await response.json();
-    return jsonResponse;
+        if (!response.ok) {
+             throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        const jsonResponse = await response.json();
+        return jsonResponse;
+    } catch (err) {
+        console.error("Fetch failed:", err);
+        throw err;
+    }
+
 }

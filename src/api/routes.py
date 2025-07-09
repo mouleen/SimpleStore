@@ -22,10 +22,10 @@ def handle_hello():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     response_body = {
-        "message": f"Hola {user.username}! Bienvenido gracias por ingresar tus credenciales"
+        "message": f"Hola {user.username}! Bienvenido gracias por ingresar tus credenciales",
+        "ok":True
     }
-
-    return jsonify(response_body ), 200
+    return jsonify(response_body), 200
 
 # Endpoint de Registracion
 @api.route("/register", methods=["POST"])

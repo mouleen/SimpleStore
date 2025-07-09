@@ -1,14 +1,14 @@
 export const initialStore=()=>{
   return{
     message: null,
-    token: null,
-    user:null
+    token: localStorage.getItem('token') || null,
+    user: localStorage.getItem('user') || null,
   }
 }
 
 export default function storeReducer(store, action = {}) {
   switch(action.type){
-    case 'set_hello':
+    case 'get_hello':
       return {
         ...store,
         message: action.payload

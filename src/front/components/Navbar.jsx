@@ -28,7 +28,7 @@ export const Navbar = () => {
 
 						</>
 					):( 
-							<Link to="/userprofile/me"> {store.user} </Link>
+							<Link to="/userprofile/me"> <span className="me-2"> <i className="fa-solid fa-user display-6 me-2"></i>{store.user} </span> </Link>
 					)
 				}
 				</div>

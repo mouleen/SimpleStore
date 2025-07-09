@@ -2,9 +2,11 @@ import React, { useState,useEffect } from "react";
 import { getToken } from "../services/api";
 import { useNavigate } from 'react-router-dom';
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { useLocation } from 'react-router-dom';
 
 export const LoginForm = ({ setToken }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [hasAuth,setHasAuth]= useState(false);
@@ -16,7 +18,10 @@ export const LoginForm = ({ setToken }) => {
 		setHasAuth(false);
 		localStorage.removeItem("user");
 		localStorage.removeItem("token");
-    dispatch({type:"get_token", payload:"" });
+    localStorage.removeItem("message");
+    dispatch({type:"set_token", payload:"" });
+    dispatch({type:"get_helo", payload:"" });
+    dispatch({type:"get_user", payload:"" });
     setLoading(false);
     navigate('/login')
 	}
@@ -27,25 +32,29 @@ export const LoginForm = ({ setToken }) => {
     const res = await getToken(form); 
     if (res.ok) {
       //setToken(data.access_token);
-      localStorage.setItem("token", res.access_token);
-      localStorage.setItem("user", res.username);
-      dispatch({type:"get_token", payload:res.access_token });
-      dispatch({type:"get_user", payload:res.username });
+      localStorage.setItem("token", await res?.access_token);
+      localStorage.setItem("user", await res?.username);
+      dispatch({type:"get_token", payload:await res.access_token });
+      dispatch({type:"get_user", payload:await res.username });
       setHasAuth(true);
-      setLoading(true);
+      setLoading(false);
+      setError("un exito");
 		  //setToken(store.token);
-      console.log("TOKEN=",store.token);
+      console.log("okTOKEN=",res.access_token);
       if (location.pathname !== '/') {
+        console.log("navigate");
         navigate('/'); 
+      } else {
+        console.log(location.pathname)
       }
     } else {
 		  //localStorage.removeItem("user");
-		  localStorage.removeItem("token");
-      dispatch({type: "get_token",payload: "" });
-      console.log("TOKEN=",store.token)
+		  //localStorage.removeItem("token");
+      //dispatch({type: "get_token",payload: "" });
+      console.log("negativo-TOKEN=",store.token)
       setHasAuth(false);
       setLoading(false);
-      setError(res.msg);
+      setError('ERROR - '+res?.msg );
     }
   };
   useEffect(() => {
@@ -53,27 +62,21 @@ export const LoginForm = ({ setToken }) => {
 		if(lsToken){
       setHasAuth(true);
       setLoading(false);
+      const lsUser=localStorage.getItem("user");
       dispatch({type: "get_token",payload: lsToken });
+      dispatch({type: "get_user",payload: lsUser });
 
-      const timer = setTimeout(() => {
-        setLoading(false);
-        navigate("/"); 
-      }, 200); // segundos
-  
-      return () => clearTimeout(timer); // limpieza
+      // const timer = setTimeout(() => {
+      //   setLoading(false);
+      //   navigate("/"); 
+      // }, 20); // segundos
+      console.log('useEffectLoginForm')
+      // return () => clearTimeout(timer); // limpieza
 		}
-  },[navigate,hasAuth,loading])
+  },[navigate,hasAuth])
   return (
     <div className="row text-center">
-      { loading && hasAuth ? (
-          <div className="col-12">
-            <div className="text-center spinner-border text-primary" role="status">
-              <span className="visually-hidden">Cargando...</span>
-            </div>
-            <p>Sesión iniciada en breve seras redirigido</p>
-          </div>
-        ) : (
-           !hasAuth ? ( 
+      { (!hasAuth ? ( 
             <div className="row text-center">
               <div className="col-12 offset-2">
                 <form className="my-1 py-1 mx-5 px-5 w-50" onSubmit={handleLogin}>
@@ -89,10 +92,10 @@ export const LoginForm = ({ setToken }) => {
             </div>
           ) : (  
           <div className="col-12">
-            <div className="text-center spinner-border text-primary" role="status">
-            </div>
+            {/* <div className="text-center spinner-border text-primary" role="status">
+            </div> */}
             <button className="btn btn-secondary my-1 w-100" onClick={handleLogout}>Logout</button> 
-            <p>sesion iniciada en breve seras redirigido</p>
+            <p>sesion iniciada</p>
           </div>
         ))
       }
