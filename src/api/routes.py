@@ -35,12 +35,16 @@ def register():
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
+    passsword_validate = data.get("password_validate")
+
+    if  password != passsword_validate:
+        return jsonify({"msg":f"Las contraseñas no son iguales{passsword_validate}","ok":False}), 400
 
     if not username or not email or not password:
-        return jsonify({"msg": "Datos incompletos"}), 400
+        return jsonify({"msg": "Datos incompletos","ok":False}), 400
 
     if User.query.filter((User.username == username) | (User.email == email)).first():
-        return jsonify({"msg": "No es posible crear un usuario con esos datos"}), 409
+        return jsonify({"msg": "No es posible crear un usuario con esos datos","ok":False}), 409
 
     new_user = User(username=username, email=email)
     new_user.set_password(password)
@@ -65,7 +69,7 @@ def create_token():
    
     user = User.query.filter_by(username=username).first()
     if not user or not user.check_password(password):
-        return jsonify({"msg": "Credenciales inválidas"}), 401
+        return jsonify({"msg": "Credenciales inválidas","ok":False}), 401
 
     access_token = create_access_token(identity=str(user.id))
     return jsonify(access_token=access_token, username=user.username, ok=True ), 200

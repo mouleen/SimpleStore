@@ -1,9 +1,12 @@
 import React, { useEffect,useState } from "react"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { getHello } from "../services/api";
+import { useGlobalHelpers } from "../hooks/useGlobalHelpers";
 
 export const Home = () => {
 	const { store, dispatch } = useGlobalReducer()
+
+	const { logoutUser } = useGlobalHelpers();
 
 
 	//JWT:Variables
@@ -12,15 +15,10 @@ export const Home = () => {
 	const [message, setMessage] = useState(localStorage.getItem("message") || null);
 	//JWT:Logout
 	const handleLogout = () => {
+		logoutUser();
 		setUser(null);
 		setToken(null);
 		setMessage(null);
-		dispatch({type:"token", payload:"" });
-		dispatch({type:"user", payload:"" });
-		dispatch({type:"message", payload:"" });
-		localStorage.removeItem("user");
-		localStorage.removeItem("token");localStorage.removeItem("message");
-
 	}
     const loadSession = () => {
 		const lsToken=localStorage.getItem("token");

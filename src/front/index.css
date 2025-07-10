@@ -1,5 +1,9 @@
 body{
-    background: linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%);
+    /*background: bg-color bg-image position/bg-size bg-repeat bg-origin bg-clip bg-attachment initial|inherit;
+    https://www.w3schools.com/cssref/css3_pr_background.php
+    */
+    /*background: linear-gradient(135deg, #fef7ed 0%, #d5ea96 100%) */
+    background:url("assets/img/adventure-map.svg") 100% 120%/auto no-repeat border-box padding-box scroll;
 }
 
 .container-style{
@@ -24,4 +28,12 @@ body{
 }
 .input-group-text{
     height: 40px;
+}
+/* footer sticky */
+html, body {
+    height: 100%;
+    margin:0;
+}
+footer {
+    flex-shrink: 0 ; /* No se encoge */
 }
