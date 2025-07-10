@@ -15,9 +15,9 @@ export const Home = () => {
 		setUser(null);
 		setToken(null);
 		setMessage(null);
-		dispatch({type:"get_token", payload:"" });
-		dispatch({type:"get_user", payload:"" });
-		dispatch({type:"get_hello", payload:"" });
+		dispatch({type:"token", payload:"" });
+		dispatch({type:"user", payload:"" });
+		dispatch({type:"message", payload:"" });
 		localStorage.removeItem("user");
 		localStorage.removeItem("token");localStorage.removeItem("message");
 
@@ -26,8 +26,8 @@ export const Home = () => {
 		const lsToken=localStorage.getItem("token");
 		const lsUser=localStorage.getItem("user");
 		if(lsToken){
-			dispatch({type:"get_token", payload:lsToken });
-			dispatch({type:"get_user", payload:lsUser});
+			dispatch({type:"token", payload:lsToken });
+			dispatch({type:"user", payload:lsUser});
 			setToken(lsToken);
 			setUser(lsUser);
 			return true;
@@ -39,7 +39,7 @@ export const Home = () => {
 		if(token && !message){
 			try {
 				const data=await getHello(token);
-				dispatch({ type: "get_hello", payload: await data?.message })
+				dispatch({ type: "message", payload: await data?.message })
 				setMessage(await data?.message)
 				localStorage.setItem("message", await data?.message);
 			} catch (error) {
