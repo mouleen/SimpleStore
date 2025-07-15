@@ -24,6 +24,14 @@ class User(db.Model):
             "username": self.username,
             # do not serialize the password, its a security breach
         }
+    def serialize_register(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "username": self.username,
+            "role":self.role,
+            # do not serialize the password, its a security breach
+        }
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)  # Hashea con pbkdf2:sha256
@@ -45,7 +53,7 @@ class Store(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     nombre: Mapped[str] = mapped_column(String(100), nullable=False)
     direccion: Mapped[str] = mapped_column(String(255), nullable=False)
-    activo: Mapped[bool] = mapped_column(default=True, nullable=False)
+    is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     fecha_de_pago: Mapped[Date] = mapped_column(Date, nullable=True)  
 
     menus = relationship("Menu", back_populates="store")
@@ -72,7 +80,8 @@ class Store(db.Model):
             "address": self.direccion,
             "user_id": self.user_id,
             "images": [img.serialize_store() for img in self.images],
-            "points": [point.serialize() for point in self.points]
+            "points": [point.serialize() for point in self.points],
+            "is_active": self.is_active
         }
 
 class Category(db.Model):

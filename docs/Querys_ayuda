@@ -36,6 +36,11 @@ WHERE images.owner_type = 'store'
   AND images.user_id IS NULL;
 
 # agregue la columna a mano y borre el migrations anterior porque daba error el upgrade
-ALTER TABLE images ADD COLUMN user_id INTEGER; 
+q
 # valido que no quede ningun user_id null de antes del registro user_id
 SELECT COUNT(*) FROM images WHERE user_id IS NULL;
+
+
+
+UPDATE stores                                     
+SET is_active = true
