@@ -7,7 +7,10 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
 from api.models import db,User
-from api.routes import api
+from api.base import api
+from api.routes.images import routes_image
+from api.routes.stores import routes_store
+from api.routes.users import routes_user
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager,create_access_token
@@ -50,9 +53,16 @@ setup_admin(app)
 setup_commands(app)
 
 
+# Add all endpoints form the API with a "api" prefix
+app.register_blueprint(routes_image) # /api/images
+# Add all endpoints form the API with a "api" prefix
+app.register_blueprint(routes_store) # /api/stores
+app.register_blueprint(routes_user) # /api/users
+
 
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
+
 
 # Handle/serialize errors like a JSON object
 

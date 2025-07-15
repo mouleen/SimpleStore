@@ -19,7 +19,7 @@ export const Navbar = () => {
 			<div className="container-fluid">
 				<Link className="text-decoration-none link-warning" to="/">
 					<img className="d-inline-block rounded-3 mx-4 mb-2" src="https://avatars.githubusercontent.com/u/202177717?v=4" alt="Logo" width="30" height="30" ></img>
-					<span className="navbar-brand mb-0 mt-3 h1 text-dark">Simple Basic Store</span>
+					<span className="navbar-brand mb-0 mt-3 h1 text-dark">Simple Basic git</span>
 				</Link>
 				<div className="ml-auto">
 					{ !store?.token ? (

@@ -1,0 +1,41 @@
+
+# Usuario Admin
+UPDATE users                                      
+SET role = 'SuperAdmin'
+WHERE id = 1;
+UPDATE 1
+
+# Purgado de registros con formato viejo
+
+UPDATE images                                     
+SET user_id = owner_id
+WHERE owner_type = 'user'
+  AND user_id IS NULL;
+
+UPDATE images                                     
+SET user_id = s.user_id
+FROM menus m
+JOIN stores s ON m.store_id = s.id
+WHERE images.owner_type = 'menu'
+  AND images.owner_id = m.id
+  AND images.user_id IS NULL;
+
+UPDATE images                                     
+SET user_id = s.user_id
+FROM products p
+JOIN stores s ON p.store_id = s.id
+WHERE images.owner_type = 'product'
+  AND images.owner_id = p.id
+  AND images.user_id IS NULL;
+
+UPDATE images                                     
+SET user_id = s.user_id
+FROM stores s
+WHERE images.owner_type = 'store'
+  AND images.owner_id = s.id
+  AND images.user_id IS NULL;
+
+# agregue la columna a mano y borre el migrations anterior porque daba error el upgrade
+ALTER TABLE images ADD COLUMN user_id INTEGER; 
+# valido que no quede ningun user_id null de antes del registro user_id
+SELECT COUNT(*) FROM images WHERE user_id IS NULL;

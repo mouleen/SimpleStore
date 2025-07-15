@@ -93,6 +93,12 @@ class Menu(db.Model):
     store = relationship("Store", back_populates="menus")
     products = relationship("Product", back_populates="menu")
 
+    # Relación polimórfica con imágenes
+    images = relationship(
+        "Image",
+        primaryjoin="and_(foreign(Image.owner_id) == Menu.id, Image.owner_type == 'menu')",
+        viewonly=True
+    )
 
 class Product(db.Model):
     __tablename__ = "products"
@@ -125,11 +131,13 @@ class Image(db.Model):
     __tablename__ = "images"
     id: Mapped[int] = mapped_column(primary_key=True)
     owner_id: Mapped[int] = mapped_column(nullable=False)
-    owner_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'store', 'product', 'user'
+    owner_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'store', 'product', 'user', 'menu'
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     type: Mapped[str] = mapped_column(String(50), nullable=False)
     url: Mapped[str] = mapped_column(String(255), nullable=False)
     position: Mapped[int] = mapped_column(default=0, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+
 
     def serialize(self):
         return {
@@ -139,7 +147,8 @@ class Image(db.Model):
             "url": self.url,
             "position": self.position,
             "owner_type": self.owner_type,
-            "owner_id": self.owner_id
+            "owner_id": self.owner_id,
+            "user_id": self.user_id
         }
     def serialize_store(self):
         return {
