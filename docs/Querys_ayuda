@@ -40,7 +40,7 @@ q
 # valido que no quede ningun user_id null de antes del registro user_id
 SELECT COUNT(*) FROM images WHERE user_id IS NULL;
 
-
+ALTER TABLE stores ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
 
 UPDATE stores                                     
 SET is_active = true

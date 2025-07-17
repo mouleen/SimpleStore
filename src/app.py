@@ -11,30 +11,28 @@ from api.base import api
 from api.routes.images import routes_image
 from api.routes.stores import routes_store
 from api.routes.users import routes_user
+from api.routes.products import routes_product
+from api.routes.menus import routes_menu
+from api.routes.userpoints import routes_userpoint
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager,create_access_token
 
 
 
-
-
-
-
-# from models import Person
-
+# Environment
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
 
-# Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = "madeinUSA"  # Change this "super secret" to something else!
+# Configuración de extension Flask-JWT-Extended 
+app.config["JWT_SECRET_KEY"] = "madeinUSA"  
 jwt = JWTManager(app)
 
 app.url_map.strict_slashes = False
 
-# database condiguration
+# Confguración de base de datos 
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(
@@ -53,13 +51,13 @@ setup_admin(app)
 setup_commands(app)
 
 
-# Add all endpoints form the API with a "api" prefix
+
 app.register_blueprint(routes_image) # /api/images
-# Add all endpoints form the API with a "api" prefix
 app.register_blueprint(routes_store) # /api/stores
 app.register_blueprint(routes_user) # /api/users
-
-
+app.register_blueprint(routes_product) # /api/product
+app.register_blueprint(routes_menu) # /api/menu
+app.register_blueprint(routes_userpoint) # /api/userpoint
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
 

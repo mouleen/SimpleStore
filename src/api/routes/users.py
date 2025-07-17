@@ -43,7 +43,7 @@ def register():
         # Validar el ROLE
         valid_types = [ f"{ROLE_USER}", f"{ROLE_STORE}",f"{ROLE_ADMIN}"]
         if data['role'] in valid_types:
-            new_user.role=data['role']
+            new_user.role=data['role'].capitalize()
 
     db.session.add(new_user)
     db.session.commit()
@@ -62,7 +62,7 @@ def register():
 @routes_user.route("/admin/list",methods=["GET"])
 def test():
     users = User.query.all()
-    return jsonify([user.serialize() for user in users]), 200
+    return jsonify([user.serialize_register() for user in users]), 200
 
 # Endpoint de Logout
 @routes_user.route("/login", methods=["POST"])

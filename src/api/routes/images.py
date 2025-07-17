@@ -33,8 +33,6 @@ def images_list_admin():
         "ok": True,
         "data": [image.serialize() for image in images]
     })
-    
-
     return response,200
 
 @routes_image.route('/list', methods=['GET'])

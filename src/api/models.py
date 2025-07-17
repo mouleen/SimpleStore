@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, ForeignKey, CheckConstraint, Date,Boolean,Table
+from sqlalchemy import String, ForeignKey, CheckConstraint, Date,Boolean,Table,DateTime,func,select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import List, Optional
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -55,6 +56,7 @@ class Store(db.Model):
     direccion: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     fecha_de_pago: Mapped[Date] = mapped_column(Date, nullable=True)  
+    total_points: Mapped[int] = mapped_column(nullable=True)
 
     menus = relationship("Menu", back_populates="store")
     user: Mapped["User"] = relationship("User", back_populates="stores")
@@ -81,9 +83,15 @@ class Store(db.Model):
             "user_id": self.user_id,
             "images": [img.serialize_store() for img in self.images],
             "points": [point.serialize() for point in self.points],
+            "total_points":self.total_points,
             "is_active": self.is_active
         }
-
+    def serialize_menu(self):
+        return {
+            "id": self.id,
+            "name": self.nombre
+        }
+    
 class Category(db.Model):
     __tablename__ = "categories"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -97,7 +105,6 @@ class Menu(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     store_id: Mapped[int] = mapped_column(
         ForeignKey("stores.id"), nullable=False)
-    category: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     store = relationship("Store", back_populates="menus")
     products = relationship("Product", back_populates="menu")
@@ -108,15 +115,25 @@ class Menu(db.Model):
         primaryjoin="and_(foreign(Image.owner_id) == Menu.id, Image.owner_type == 'menu')",
         viewonly=True
     )
+    def serialize(self):
+        return {
+            "id": self.id,
+            "description": self.description,
+            "store": self.store.serialize(),
+            "products": [product.serialize_menu() for product in self.products],
+            "images": [img.serialize_store() for img in self.images]
+        }
 
 class Product(db.Model):
     __tablename__ = "products"
     id: Mapped[int] = mapped_column(primary_key=True)
     menu_id: Mapped[int] = mapped_column(
         ForeignKey("menus.id"), nullable=False)
+    category: Mapped[str] = mapped_column(String(100), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
-
+    price: Mapped[int] = mapped_column(nullable=True)
+    is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     menu = relationship("Menu", back_populates="products")
 
     # Relación polimórfica con imágenes
@@ -131,11 +148,14 @@ class Product(db.Model):
             "id": self.id,
             "name": self.name,
             "description": self.description,
+            "category": self.category,
             "menu_id": self.menu_id,
-            "images": [img.serialize() for img in self.images]
+            "images": [img.serialize() for img in self.images],
+            "price": self.price
         }
 
 
+# consultar con filtro Image.query.filter_by(owner_type='store', owner_id=store.id).all()
 class Image(db.Model):
     __tablename__ = "images"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -165,7 +185,6 @@ class Image(db.Model):
             "position": self.position,
         }
 
-# consultar con filtro Image.query.filter_by(owner_type='store', owner_id=store.id).all()
 class UserPoint(db.Model):
     __tablename__ = "userpoints"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -174,4 +193,27 @@ class UserPoint(db.Model):
     store_id: Mapped[int] = mapped_column(
         ForeignKey("stores.id"), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
+    points: Mapped[int] = mapped_column(nullable=True)
     store = relationship("Store", back_populates="points")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+
+    def serialize(self):
+        return {
+            "user_id": self.user_id,
+            "store_id": self.store_id,
+            "description": self.description,
+            "points": self.points,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+    
+
+    @classmethod
+    def total(cls, store_id, session):
+        result = session.execute(
+            select(func.avg(cls.points)).where(cls.store_id == store_id)
+        ).scalar()
+        return result or 0  # Devuelve 0 si no hay resultados
